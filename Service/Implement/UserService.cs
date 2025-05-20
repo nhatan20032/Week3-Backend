@@ -85,8 +85,8 @@ namespace EFCorePracticeAPI.Service.Implement
             var pagedResult = await _unitOfWork.Users.GetAllAsync(
                 pageNumber: page,
                 pageSize: pageSize,
-                filter: x => string.IsNullOrEmpty(search) || 
-                        x.Username.ToLower().Contains(search.ToLower()) || 
+                filter: x => string.IsNullOrEmpty(search) ||
+                        x.Username.ToLower().Contains(search.ToLower()) ||
                         x.Fullname!.ToLower().Contains(search.ToLower()),
                 orderBy: q => q.OrderBy(x => x.Fullname),
                 include: query => query
