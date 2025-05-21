@@ -29,14 +29,24 @@ namespace EFCorePracticeAPI.Repository.Implement
             return await Task.FromResult(entity);
         }
 
-        public async Task<T?> FindAsync(Expression<Func<T, bool>> expression)
+        public async Task<T?> FindAsync(Expression<Func<T, bool>> expression, Func<IQueryable<T>, IIncludableQueryable<T, object>> include = null!)
         {
-            return await _dbSet.FirstOrDefaultAsync(expression);
+            IQueryable<T> query = _dbSet;
+
+            if (include != null)
+                query = include(query);
+
+            return await query.FirstOrDefaultAsync(expression);
         }
 
-        public async Task<IEnumerable<T>> FindAllAsync(Expression<Func<T, bool>> expression)
+        public async Task<IEnumerable<T>> FindAllAsync(Expression<Func<T, bool>> expression, Func<IQueryable<T>, IIncludableQueryable<T, object>> include = null!)
         {
-            return await _dbSet.Where(expression).ToListAsync();
+            IQueryable<T> query = _dbSet;
+
+            if (include != null)
+                query = include(query);
+
+            return await query.Where(expression).ToListAsync();
         }
 
         public async Task<PagedResult<T>> GetAllAsync(int pageNumber = 1,

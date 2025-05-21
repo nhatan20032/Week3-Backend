@@ -5,6 +5,7 @@ using EFCorePracticeAPI.Service.Interface;
 using EFCorePracticeAPI.ViewModals;
 using EFCorePracticeAPI.ViewModals.User;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace EFCorePracticeAPI.Service.Implement
 {
@@ -194,9 +195,43 @@ namespace EFCorePracticeAPI.Service.Implement
             };
         }
 
-        public Task<LoginResult<V_GetUser>?> LoginWithRefreshToken(string refreshToken)
+        public async Task<LoginResult<V_GetUser>?> LoginWithRefreshToken(string refreshToken)
         {
-            throw new NotImplementedException();
+            var token = await _unitOfWork.RefreshTokens.FindAsync(
+                t => t.Token == refreshToken,
+                include: query => query.Include(t => t.User));
+
+            if (token == null || token.ExpiryDate < DateTime.UtcNow)
+            {
+                throw new ApplicationException("The refresh token has expired");
+            }
+
+            string accessToken = _tokenProvider.Create(token.User);
+
+            token.Token = _tokenProvider.GenerateRefreshToken();
+            token.ExpiryDate = DateTime.UtcNow.AddDays(7);
+
+            await _unitOfWork.RefreshTokens.UpdateAsync(token);
+
+            await _unitOfWork.CompleteAsync();
+
+            return new LoginResult<V_GetUser>
+            {
+                Data = new V_GetUser
+                {
+                    Id = token.User.Id,
+                    Username = token.User.Username,
+                    Fullname = token.User.Fullname,
+                    Passwordhash = token.User.Passwordhash,
+                    RoleName = token.User.Userroles?.Select(ur => ur.Role?.Name ?? string.Empty).ToList() ?? [],
+                    RoleId = token.User.Userroles?.Select(ur => ur.Role?.Id ?? 0).ToList() ?? []
+                },
+                TokenResult = new TokenResult
+                {
+                    AccessToken = accessToken,
+                    RefreshToken = token.Token,
+                }
+            };
         }
     }
 }

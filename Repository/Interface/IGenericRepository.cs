@@ -15,7 +15,7 @@ namespace EFCorePracticeAPI.Repository.Interface
         Task<T> AddAsync(T entity);
         Task<T> UpdateAsync(T entity);
         Task<T> DeleteAsync(T entity);
-        Task<IEnumerable<T>> FindAllAsync(Expression<Func<T, bool>> expression);
-        Task<T?> FindAsync(Expression<Func<T, bool>> expression);
+        Task<IEnumerable<T>> FindAllAsync(Expression<Func<T, bool>> expression, Func<IQueryable<T>, IIncludableQueryable<T, object>> include = null!);
+        Task<T?> FindAsync(Expression<Func<T, bool>> expression, Func<IQueryable<T>, IIncludableQueryable<T, object>> include = null!);
     }
 }
