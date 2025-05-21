@@ -4,12 +4,13 @@ using System.Security.Claims;
 using System.Text;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Cryptography;
+using EFCorePracticeAPI.ViewModals.User;
 
 namespace EFCorePracticeAPI.Infrastructure
 {
     public sealed class TokenProvider(IConfiguration configuration)
     {
-        public string Create(User user)
+        public string Create(V_GetUser user)
         {
             string secretKey = configuration["Jwt:Secret"]!;
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
@@ -28,6 +29,11 @@ namespace EFCorePracticeAPI.Infrastructure
                 Issuer = configuration["Jwt:Issuer"],
                 Audience = configuration["Jwt:Audience"]
             };
+
+            foreach (var role in user.RoleName)
+            {
+                tokenDescriptor.Subject.AddClaim(new Claim(ClaimTypes.Role, role));
+            }
 
             var handler = new JwtSecurityTokenHandler();
 

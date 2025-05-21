@@ -18,7 +18,7 @@ namespace EFCorePracticeAPI.Controllers
             _userService = userService;
         }
 
-        [HttpGet("GetUser")]
+        [HttpGet("GetUser")]        
         public async Task<IActionResult> GetAllUser(int page = 1, int pageSize = 10, string search = "")
         {
             var result = await _userService.GetAllUser(page, pageSize, search);
@@ -61,6 +61,7 @@ namespace EFCorePracticeAPI.Controllers
         }
 
         [HttpPost("AddUser")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AddUser([FromBody] V_User user)
         {
             var result = await _userService.AddUser(user);
@@ -83,6 +84,7 @@ namespace EFCorePracticeAPI.Controllers
         }
 
         [HttpDelete("DeleteUser/{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteUser([FromRoute] int id)
         {
             var result = await _userService.DeleteUser(id);
@@ -94,6 +96,7 @@ namespace EFCorePracticeAPI.Controllers
         }
 
         [HttpDelete("RevokeRefreshToken/{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> RevokeRefreshToken([FromRoute] int id)
         {
             var result = await _userService.RevokeRefreshToken(id);

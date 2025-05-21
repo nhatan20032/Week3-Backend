@@ -138,12 +138,20 @@ namespace EFCorePracticeAPI.Service.Implement
 
         public async Task<LoginResult<V_GetUser>?> Login(string username, string password)
         {
-            var user = await _unitOfWork.Users.FindAsync(t => t.Username == username);
+            var user = await _unitOfWork.Users.FindAsync(t => t.Username == username, include: t => t.Include(a => a.Userroles).ThenInclude(a => a.Role)!);
 
             if (user == null || !BCrypt.Net.BCrypt.Verify(password, user.Passwordhash))
                 return null;
 
-            string token = _tokenProvider.Create(user);
+            string token = _tokenProvider.Create(new V_GetUser
+            {
+                Id = user.Id,
+                Username = user.Username,
+                Fullname = user.Fullname,
+                Passwordhash = user.Passwordhash,
+                RoleName = user.Userroles?.Select(ur => ur.Role?.Name ?? string.Empty).ToList() ?? [],
+                RoleId = user.Userroles?.Select(ur => ur.Role?.Id ?? 0).ToList() ?? []
+            });
 
             var refreshToken = new RefreshToken
             {
@@ -209,7 +217,16 @@ namespace EFCorePracticeAPI.Service.Implement
                 throw new ApplicationException("The refresh token has expired");
             }
 
-            string accessToken = _tokenProvider.Create(token.User);
+
+            string accessToken = _tokenProvider.Create(new V_GetUser
+            {
+                Id = token.User.Id,
+                Username = token.User.Username,
+                Fullname = token.User.Fullname,
+                Passwordhash = token.User.Passwordhash,
+                RoleName = token.User.Userroles?.Select(ur => ur.Role?.Name ?? string.Empty).ToList() ?? [],
+                RoleId = token.User.Userroles?.Select(ur => ur.Role?.Id ?? 0).ToList() ?? []
+            });
 
             token.Token = _tokenProvider.GenerateRefreshToken();
             token.ExpiryDate = DateTime.UtcNow.AddDays(7);
