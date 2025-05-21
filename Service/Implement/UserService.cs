@@ -165,7 +165,7 @@ namespace EFCorePracticeAPI.Service.Implement
                 },
                 TokenResult = new TokenResult
                 {
-                    Token = token,
+                    AccessToken = token,
                     RefreshToken = refreshToken.Token,
                 }
             };
@@ -192,6 +192,11 @@ namespace EFCorePracticeAPI.Service.Implement
                 RoleId = deletedUser.Userroles!.Select(ur => ur.Role?.Id ?? 0).ToList(),
                 RoleName = deletedUser.Userroles!.Select(ur => ur.Role?.Name ?? string.Empty).ToList()
             };
+        }
+
+        public Task<LoginResult<V_GetUser>?> LoginWithRefreshToken(string refreshToken)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -1,11 +1,13 @@
 ﻿using EFCorePracticeAPI.Dtos;
 using EFCorePracticeAPI.Service.Interface;
 using EFCorePracticeAPI.ViewModals.User;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EFCorePracticeAPI.Controllers
 {
     [Route("api/[controller]")]
+    [Authorize]
     [ApiController]
     public class UsersController : ControllerBase
     {
@@ -35,6 +37,7 @@ namespace EFCorePracticeAPI.Controllers
         }
 
         [HttpPost("Login")]
+        [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody] LoginRequest loginRequest)
         {
             var result = await _userService.Login(loginRequest.Username, loginRequest.Password);
