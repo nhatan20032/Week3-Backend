@@ -8,11 +8,10 @@ public partial class User
 
     public string Passwordhash { get; set; } = null!;
 
-    public string? Refreshtoken { get; set; }
-
-    public DateTime? Refreshtokenexpiry { get; set; }
-
     public string? Fullname { get; set; }
 
-    public virtual ICollection<Userrole> Userroles { get; set; } = new List<Userrole>();
+    public string? Email { get; set; }
+
+    public virtual ICollection<Userrole> Userroles { get; set; } = [];
+    public virtual ICollection<RefreshToken> RefreshTokens { get; set; } = [];
 }

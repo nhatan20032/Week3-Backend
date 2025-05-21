@@ -35,8 +35,6 @@ namespace EFCorePracticeAPI.Service.Implement
                 Username = addUserResult.Username,
                 Fullname = addUserResult.Fullname,
                 Passwordhash = addUserResult.Passwordhash,
-                Refreshtoken = addUserResult.Refreshtoken,
-                Refreshtokenexpiry = addUserResult.Refreshtokenexpiry,
                 RoleId = addUserResult.Userroles!.Select(ur => ur.Role?.Id ?? 0).ToList(),
                 RoleName = addUserResult.Userroles!.Select(ur => ur.Role?.Name ?? string.Empty).ToList()
             };
@@ -73,8 +71,6 @@ namespace EFCorePracticeAPI.Service.Implement
                 Username = updated.Username,
                 Fullname = updated.Fullname,
                 Passwordhash = updated.Passwordhash,
-                Refreshtoken = updated.Refreshtoken,
-                Refreshtokenexpiry = updated.Refreshtokenexpiry,
                 RoleId = updated.Userroles?.Select(ur => ur.Role?.Id ?? 0).ToList() ?? [],
                 RoleName = updated.Userroles?.Select(ur => ur.Role?.Name ?? string.Empty).ToList() ?? []
             };
@@ -146,15 +142,13 @@ namespace EFCorePracticeAPI.Service.Implement
                     Username = user.Username,
                     Fullname = user.Fullname,
                     Passwordhash = user.Passwordhash,
-                    Refreshtoken = user.Refreshtoken,
-                    Refreshtokenexpiry = user.Refreshtokenexpiry,
                     RoleName = user.Userroles?.Select(ur => ur.Role?.Name ?? string.Empty).ToList() ?? [],
                     RoleId = user.Userroles?.Select(ur => ur.Role?.Id ?? 0).ToList() ?? []
                 },
                 TokenResult = new TokenResult
                 {
-                    Token = user.Refreshtoken,
-                    Expiry = user.Refreshtokenexpiry
+                    Token = "",
+                    Expiry = DateTime.UtcNow
                 }
             };
         }
@@ -177,8 +171,6 @@ namespace EFCorePracticeAPI.Service.Implement
                 Username = deletedUser.Username,
                 Fullname = deletedUser.Fullname,
                 Passwordhash = deletedUser.Passwordhash,
-                Refreshtoken = deletedUser.Refreshtoken,
-                Refreshtokenexpiry = deletedUser.Refreshtokenexpiry,
                 RoleId = deletedUser.Userroles!.Select(ur => ur.Role?.Id ?? 0).ToList(),
                 RoleName = deletedUser.Userroles!.Select(ur => ur.Role?.Name ?? string.Empty).ToList()
             };
