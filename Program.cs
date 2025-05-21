@@ -1,4 +1,5 @@
 using EFCorePracticeAPI.Data;
+using EFCorePracticeAPI.Infrastructure;
 using EFCorePracticeAPI.Middleware;
 using EFCorePracticeAPI.Repository.Implement;
 using EFCorePracticeAPI.Repository.Interface;
@@ -18,6 +19,8 @@ builder.Services.AddDbContextFactory<AppDbContext>(options =>
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
+
+builder.Services.AddSingleton<TokenProvider>();
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();

@@ -9,6 +9,7 @@ namespace EFCorePracticeAPI.Repository.Implement
         private readonly AppDbContext _context;
         private readonly Hashtable _repositories = new();
         private IUserRepository? _userRepository;
+        private IRefreshTokenRepository? _refreshTokenRepository;
 
         public UnitOfWork(AppDbContext context) => _context = context;
 
@@ -41,5 +42,6 @@ namespace EFCorePracticeAPI.Repository.Implement
         }
 
         public IUserRepository Users => _userRepository ??= new UserRepository(_context);
+        public IRefreshTokenRepository RefreshTokens => _refreshTokenRepository ??= new RefreshTokenRepository(_context);
     }
 }

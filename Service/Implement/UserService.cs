@@ -1,4 +1,5 @@
-﻿using EFCorePracticeAPI.Models;
+﻿using EFCorePracticeAPI.Infrastructure;
+using EFCorePracticeAPI.Models;
 using EFCorePracticeAPI.Repository.Interface;
 using EFCorePracticeAPI.Service.Interface;
 using EFCorePracticeAPI.ViewModals;
@@ -10,10 +11,14 @@ namespace EFCorePracticeAPI.Service.Implement
     public class UserService : IUserService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly TokenProvider _tokenProvider;
 
-        public UserService(IUnitOfWork unitOfWork)
+        public UserService(
+            IUnitOfWork unitOfWork,
+            TokenProvider tokenProvider)
         {
             _unitOfWork = unitOfWork;
+            _tokenProvider = tokenProvider;
         }
 
         public async Task<V_GetUser?> AddUser(V_User user)
@@ -134,6 +139,19 @@ namespace EFCorePracticeAPI.Service.Implement
             if (user == null || !BCrypt.Net.BCrypt.Verify(password, user.Passwordhash))
                 return null;
 
+            string token = _tokenProvider.Create(user);
+
+            var refreshToken = new RefreshToken
+            {
+                UserId = user.Id,
+                Token = _tokenProvider.GenerateRefreshToken(),
+                ExpiryDate = DateTime.UtcNow.AddDays(7)
+            };
+
+            await _unitOfWork.RefreshTokens.AddAsync(refreshToken);
+
+            await _unitOfWork.CompleteAsync();
+
             return new LoginResult<V_GetUser>
             {
                 Data = new V_GetUser
@@ -147,8 +165,8 @@ namespace EFCorePracticeAPI.Service.Implement
                 },
                 TokenResult = new TokenResult
                 {
-                    Token = "",
-                    Expiry = DateTime.UtcNow
+                    Token = token,
+                    RefreshToken = refreshToken.Token,
                 }
             };
         }
