@@ -3,6 +3,7 @@ using EFCorePracticeAPI.Repository.Interface;
 using EFCorePracticeAPI.ViewModals;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
+using Serilog;
 using System.Linq.Expressions;
 
 namespace EFCorePracticeAPI.Repository.Implement
@@ -54,7 +55,7 @@ namespace EFCorePracticeAPI.Repository.Implement
                     Expression<Func<T, bool>> filter = null!,
                     Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null!,
                     Func<IQueryable<T>, IIncludableQueryable<T, object>> include = null!)
-        {
+        {           
             IQueryable<T> query = _dbSet;
 
             if (filter != null)

@@ -5,6 +5,7 @@ using EFCorePracticeAPI.Service.Interface;
 using EFCorePracticeAPI.ViewModals;
 using EFCorePracticeAPI.ViewModals.User;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using System.Security.Claims;
 
 namespace EFCorePracticeAPI.Service.Implement
@@ -138,11 +139,13 @@ namespace EFCorePracticeAPI.Service.Implement
 
         public async Task<LoginResult<V_GetUser>?> Login(string username, string password)
         {
+            Log.Information("Starting loging by username and password");
             var user = await _unitOfWork.Users.FindAsync(t => t.Username == username, include: t => t.Include(a => a.Userroles).ThenInclude(a => a.Role)!);
 
             if (user == null || !BCrypt.Net.BCrypt.Verify(password, user.Passwordhash))
                 return null;
 
+            Log.Information("Login Success");
             string token = _tokenProvider.Create(new V_GetUser
             {
                 Id = user.Id,
