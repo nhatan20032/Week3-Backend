@@ -48,6 +48,18 @@ namespace EFCorePracticeAPI.Controllers
             return Ok(result);
         }
 
+        [HttpPost("LoginWithRefreshToken")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Login([FromBody] string refreshToken)
+        {
+            var result = await _userService.Login(refreshToken);
+            if (result == null)
+            {
+                return NotFound($"Wrong Username or Password please check");
+            }
+            return Ok(result);
+        }
+
         [HttpPost("AddUser")]
         public async Task<IActionResult> AddUser([FromBody] V_User user)
         {
@@ -75,6 +87,17 @@ namespace EFCorePracticeAPI.Controllers
         {
             var result = await _userService.DeleteUser(id);
             if (result == null)
+            {
+                return NotFound($"Entity of type User with ID {id} not found.");
+            }
+            return Ok(result);
+        }
+
+        [HttpDelete("RevokeRefreshToken/{id}")]
+        public async Task<IActionResult> RevokeRefreshToken([FromRoute] int id)
+        {
+            var result = await _userService.RevokeRefreshToken(id);
+            if (!result)
             {
                 return NotFound($"Entity of type User with ID {id} not found.");
             }

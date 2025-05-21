@@ -10,7 +10,8 @@ namespace EFCorePracticeAPI.Service.Interface
         Task<V_GetUser?> AddUser(V_User user);
         Task<V_GetUser?> UpdateUser(V_User user);
         Task<LoginResult<V_GetUser>?> Login(string username, string password);
-        Task<LoginResult<V_GetUser>?> LoginWithRefreshToken(string refreshToken);
+        Task<LoginResult<V_GetUser>?> Login(string refreshToken);
+        Task<bool> RevokeRefreshToken(int userId);
         Task<V_GetUser?> DeleteUser(int id);
     }
 }

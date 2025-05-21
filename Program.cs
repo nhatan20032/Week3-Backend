@@ -6,6 +6,7 @@ using EFCorePracticeAPI.Repository.Interface;
 using EFCorePracticeAPI.Service.Implement;
 using EFCorePracticeAPI.Service.Interface;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -70,6 +71,18 @@ builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddHttpContextAccessor();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAllOrigins",
+        builder =>
+        {
+            builder.AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader();
+        });
+});
+
+
 builder.Services.AddAuthorization();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(o =>
@@ -101,6 +114,8 @@ app.UseExceptionHandler();
 app.UseAuthentication();
 
 app.UseAuthorization();
+
+app.UseCors("AllowAllOrigins");
 
 app.MapControllers();
 

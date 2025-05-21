@@ -97,5 +97,11 @@ namespace EFCorePracticeAPI.Repository.Implement
             _context.Set<T>().Update(entity);
             return await Task.FromResult(entity);
         }
+
+        public async Task<bool> DeleteAsync(Expression<Func<T, bool>> expression)
+        {
+            var result = await _context.Set<T>().Where(expression).ExecuteDeleteAsync();
+            return result > 0;
+        }
     }
 }

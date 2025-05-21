@@ -11,11 +11,19 @@ namespace EFCorePracticeAPI.Repository.Interface
             Expression<Func<T, bool>> filter = null!,
             Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null!,
             Func<IQueryable<T>, IIncludableQueryable<T, object>> include = null!);
+
         Task<T> GetByIdAsync(int id);
+
         Task<T> AddAsync(T entity);
+
         Task<T> UpdateAsync(T entity);
+
         Task<T> DeleteAsync(T entity);
+
+        Task<bool> DeleteAsync(Expression<Func<T, bool>> expression);
+
         Task<IEnumerable<T>> FindAllAsync(Expression<Func<T, bool>> expression, Func<IQueryable<T>, IIncludableQueryable<T, object>> include = null!);
+
         Task<T?> FindAsync(Expression<Func<T, bool>> expression, Func<IQueryable<T>, IIncludableQueryable<T, object>> include = null!);
     }
 }

@@ -5,7 +5,7 @@ using EFCorePracticeAPI.Service.Interface;
 using EFCorePracticeAPI.ViewModals;
 using EFCorePracticeAPI.ViewModals.User;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
+using System.Security.Claims;
 
 namespace EFCorePracticeAPI.Service.Implement
 {
@@ -13,13 +13,16 @@ namespace EFCorePracticeAPI.Service.Implement
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly TokenProvider _tokenProvider;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public UserService(
             IUnitOfWork unitOfWork,
-            TokenProvider tokenProvider)
+            TokenProvider tokenProvider,
+            IHttpContextAccessor httpContextAccessor)
         {
             _unitOfWork = unitOfWork;
             _tokenProvider = tokenProvider;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<V_GetUser?> AddUser(V_User user)
@@ -195,7 +198,7 @@ namespace EFCorePracticeAPI.Service.Implement
             };
         }
 
-        public async Task<LoginResult<V_GetUser>?> LoginWithRefreshToken(string refreshToken)
+        public async Task<LoginResult<V_GetUser>?> Login(string refreshToken)
         {
             var token = await _unitOfWork.RefreshTokens.FindAsync(
                 t => t.Token == refreshToken,
@@ -232,6 +235,20 @@ namespace EFCorePracticeAPI.Service.Implement
                     RefreshToken = token.Token,
                 }
             };
+        }
+
+        public async Task<bool> RevokeRefreshToken(int userId)
+        {
+            var currentUserId = int.TryParse(_httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier), out int idParse) ? idParse : 0;
+
+            if (userId != currentUserId)
+            {
+                throw new ApplicationException("You are not authorized to revoke this token");
+            }
+
+            await _unitOfWork.RefreshTokens.DeleteAsync(t => t.UserId == userId);
+            await _unitOfWork.CompleteAsync();
+            return true;
         }
     }
 }
