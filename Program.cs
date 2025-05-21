@@ -17,8 +17,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContextFactory<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreSQLConnection")));
 
-builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
-builder.Services.AddProblemDetails();
+//builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+//builder.Services.AddProblemDetails();
 
 // Dependency Injection For TokenProvider
 builder.Services.AddSingleton<TokenProvider>();
@@ -31,6 +31,10 @@ builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 // Dependency Injection For Services
 builder.Services.AddScoped<IUserService, UserService>();
 
+
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddAuthorization();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -42,7 +46,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseExceptionHandler();
+//app.UseExceptionHandler();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

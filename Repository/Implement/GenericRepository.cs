@@ -87,10 +87,5 @@ namespace EFCorePracticeAPI.Repository.Implement
             _context.Set<T>().Update(entity);
             return await Task.FromResult(entity);
         }
-
-        Task<T> IGenericRepository<T>.FindAsync(Expression<Func<T, bool>> expression)
-        {
-            throw new NotImplementedException();
-        }
     }
 }
