@@ -20,10 +20,15 @@ builder.Services.AddDbContextFactory<AppDbContext>(options =>
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 
+// Dependency Injection For TokenProvider
 builder.Services.AddSingleton<TokenProvider>();
 
+// Dependency Injection For Repositories
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+
+// Dependency Injection For Services
 builder.Services.AddScoped<IUserService, UserService>();
 
 var app = builder.Build();
