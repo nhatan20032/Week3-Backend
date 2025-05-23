@@ -3,7 +3,6 @@ using EFCorePracticeAPI.Repository.Interface;
 using EFCorePracticeAPI.ViewModals;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
-using Serilog;
 using System.Linq.Expressions;
 
 namespace EFCorePracticeAPI.Repository.Implement
@@ -55,7 +54,7 @@ namespace EFCorePracticeAPI.Repository.Implement
                     Expression<Func<T, bool>> filter = null!,
                     Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null!,
                     Func<IQueryable<T>, IIncludableQueryable<T, object>> include = null!)
-        {           
+        {
             IQueryable<T> query = _dbSet;
 
             if (filter != null)
@@ -67,8 +66,9 @@ namespace EFCorePracticeAPI.Repository.Implement
             if (orderBy != null)
                 query = orderBy(query);
 
-            var totalRecords = await query.CountAsync();
+            var totalRecords = await query.AsNoTracking().CountAsync();
             var items = await query
+                .AsNoTracking()
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();

@@ -5,7 +5,6 @@ using EFCorePracticeAPI.Service.Interface;
 using EFCorePracticeAPI.ViewModals;
 using EFCorePracticeAPI.ViewModals.User;
 using Microsoft.EntityFrameworkCore;
-using Serilog;
 using System.Security.Claims;
 
 namespace EFCorePracticeAPI.Service.Implement
@@ -37,7 +36,10 @@ namespace EFCorePracticeAPI.Service.Implement
 
             await _unitOfWork.CompleteAsync();
 
-            if (addUserResult == null) return null;
+            if (addUserResult == null)
+            {
+                throw new ApplicationException("Failed to create new user");
+            }
 
             return new V_GetUser
             {
@@ -52,8 +54,8 @@ namespace EFCorePracticeAPI.Service.Implement
 
         public async Task<V_GetUser?> UpdateUser(V_User user)
         {
-            var existingUser = await _unitOfWork.Users.GetByIdAsync(user.Id);
-            if (existingUser == null) return null;
+            var existingUser = await _unitOfWork.Users.GetByIdAsync(user.Id) ??
+                               throw new ApplicationException("Cannot find user. Try again!");
 
             if (!string.IsNullOrWhiteSpace(user.Username))
             {
@@ -70,10 +72,10 @@ namespace EFCorePracticeAPI.Service.Implement
                 existingUser.Passwordhash = BCrypt.Net.BCrypt.HashPassword(user.Passwordhash);
             }
 
-            var updated = await _unitOfWork.Users.UpdateAsync(existingUser);
-            await _unitOfWork.CompleteAsync();
+            var updated = await _unitOfWork.Users.UpdateAsync(existingUser) ??
+                          throw new ApplicationException("Failed to update user");
 
-            if (updated == null) return null;
+            await _unitOfWork.CompleteAsync();
 
             return new V_GetUser
             {
@@ -125,7 +127,10 @@ namespace EFCorePracticeAPI.Service.Implement
         {
             var user = await _unitOfWork.Users.GetByIdAsync(id);
 
-            if (user == null) return null;
+            if (user == null)
+            {
+                throw new ApplicationException("Cannot find user. Try again!");
+            }
 
             return new V_GetUser
             {
@@ -139,13 +144,11 @@ namespace EFCorePracticeAPI.Service.Implement
 
         public async Task<LoginResult<V_GetUser>?> Login(string username, string password)
         {
-            Log.Information("Starting loging by username and password");
             var user = await _unitOfWork.Users.FindAsync(t => t.Username == username, include: t => t.Include(a => a.Userroles).ThenInclude(a => a.Role)!);
 
             if (user == null || !BCrypt.Net.BCrypt.Verify(password, user.Passwordhash))
-                return null;
+                throw new ApplicationException("Invalid account. Please check your username or password.");
 
-            Log.Information("Login Success");
             string token = _tokenProvider.Create(new V_GetUser
             {
                 Id = user.Id,
@@ -155,6 +158,11 @@ namespace EFCorePracticeAPI.Service.Implement
                 RoleName = user.Userroles?.Select(ur => ur.Role?.Name ?? string.Empty).ToList() ?? [],
                 RoleId = user.Userroles?.Select(ur => ur.Role?.Id ?? 0).ToList() ?? []
             });
+
+            if (string.IsNullOrEmpty(token))
+            {
+                throw new ApplicationException("Failed to generate token");
+            }
 
             var refreshToken = new RefreshToken
             {
@@ -189,14 +197,13 @@ namespace EFCorePracticeAPI.Service.Implement
 
         public async Task<V_GetUser?> DeleteUser(int id)
         {
-            var user = await _unitOfWork.Users.GetByIdAsync(id);
+            var user = await _unitOfWork.Users.GetByIdAsync(id) ??
+                       throw new ApplicationException("Cannot find user. Try again!");
 
-            if (user == null) return null;
+            var deletedUser = await _unitOfWork.Users.DeleteAsync(user) ??
+                              throw new ApplicationException("Failed to delete user");
 
-            var deletedUser = await _unitOfWork.Users.DeleteAsync(user);
             await _unitOfWork.CompleteAsync();
-
-            if (deletedUser == null) return null;
 
             return new V_GetUser
             {

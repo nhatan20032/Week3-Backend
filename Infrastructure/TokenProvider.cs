@@ -1,10 +1,9 @@
-﻿using EFCorePracticeAPI.Models;
+﻿using EFCorePracticeAPI.ViewModals.User;
 using Microsoft.IdentityModel.Tokens;
-using System.Security.Claims;
-using System.Text;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Security.Cryptography;
-using EFCorePracticeAPI.ViewModals.User;
+using System.Text;
 
 namespace EFCorePracticeAPI.Infrastructure
 {

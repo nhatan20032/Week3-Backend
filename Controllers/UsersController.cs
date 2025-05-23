@@ -18,7 +18,7 @@ namespace EFCorePracticeAPI.Controllers
             _userService = userService;
         }
 
-        [HttpGet("GetUser")]        
+        [HttpGet("GetUser")]
         public async Task<IActionResult> GetAllUser(int page = 1, int pageSize = 10, string search = "")
         {
             var result = await _userService.GetAllUser(page, pageSize, search);
