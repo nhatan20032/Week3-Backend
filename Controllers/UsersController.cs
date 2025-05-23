@@ -20,7 +20,6 @@ namespace EFCorePracticeAPI.Controllers
         }
 
         [HttpGet("GetUser")]
-        [AllowAnonymous]
         public async Task<IActionResult> GetAllUser([FromQuery] SearchDto searchDto)
         {
             if (!ModelState.IsValid)
@@ -71,8 +70,8 @@ namespace EFCorePracticeAPI.Controllers
         }
 
         [HttpPost("AddUser")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> AddUser([FromBody] V_User user)
+        [Authorize(Roles = "ADMIN")]
+        public async Task<IActionResult> AddUser([FromBody] V_CreateUser user)
         {
             if (!ModelState.IsValid)
             {
@@ -90,7 +89,8 @@ namespace EFCorePracticeAPI.Controllers
         }
 
         [HttpPut("UpdateUser")]
-        public async Task<IActionResult> UpdateUser([FromBody] V_User user)
+        [Authorize(Roles = "ADMIN")]
+        public async Task<IActionResult> UpdateUser([FromBody] V_UpdateUser user)
         {
             if (!ModelState.IsValid)
             {
@@ -107,7 +107,7 @@ namespace EFCorePracticeAPI.Controllers
         }
 
         [HttpDelete("DeleteUser/{id}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> DeleteUser([FromRoute] int id)
         {
             var result = await _userService.DeleteUser(id);
@@ -119,7 +119,7 @@ namespace EFCorePracticeAPI.Controllers
         }
 
         [HttpDelete("RevokeRefreshToken/{id}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> RevokeRefreshToken([FromRoute] int id)
         {
             var result = await _userService.RevokeRefreshToken(id);

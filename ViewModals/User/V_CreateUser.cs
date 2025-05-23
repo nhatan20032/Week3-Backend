@@ -1,12 +1,12 @@
 ﻿namespace EFCorePracticeAPI.ViewModals.User
 {
-    public class V_User
+    public class V_CreateUser
     {
         public int Id { get; set; }
         public required string Username { get; set; }
         public string? Fullname { get; set; }
         public string? Email { get; set; }
         public required string Password { get; set; }
-        public int RoleId { get; set; }
+        public List<int>? RoleIds { get; set; } 
     }
 }

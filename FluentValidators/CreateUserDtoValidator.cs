@@ -3,9 +3,9 @@ using FluentValidation;
 
 namespace EFCorePracticeAPI.FluentValidators
 {
-    public sealed class CreateOrEditUserDtoValidator : AbstractValidator<V_User>
+    public sealed class CreateUserDtoValidator : AbstractValidator<V_CreateUser>
     {
-        public CreateOrEditUserDtoValidator()
+        public CreateUserDtoValidator()
         {
             RuleFor(x => x.Username)
                 .NotEmpty()
@@ -27,6 +27,17 @@ namespace EFCorePracticeAPI.FluentValidators
                 .WithMessage("Email is required.")
                 .EmailAddress()
                 .WithMessage("Invalid email format.");
+
+            RuleFor(x => x.RoleIds)
+                .NotEmpty().WithMessage("RoleIds không được rỗng.")
+                .Must(roleIds => roleIds!.Distinct().Count() == roleIds!.Count)
+                .WithMessage("RoleIds cannot be duplicate.");
+
+            RuleForEach(x => x.RoleIds)
+                        .Must(roleId => roleId > 0)
+                        .When(x => x.RoleIds != null && x.RoleIds.Count != 0)
+                        .WithMessage("All RoleIds must be positive integers like 1, 2, 3...");
+
         }
     }
 }

@@ -25,7 +25,7 @@ namespace EFCorePracticeAPI.Service.Implement
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<V_GetUser?> AddUser(V_User user)
+        public async Task<V_GetUser?> AddUser(V_CreateUser user)
         {
             var addResult = await _unitOfWork.Users.AddAsync(new User
             {
@@ -41,30 +41,40 @@ namespace EFCorePracticeAPI.Service.Implement
                 throw new ApplicationException("Failed to create new user");
             }
 
+            if (user.RoleIds != null && user.RoleIds.Count > 0)
+            {
+                await _unitOfWork.Roles.CreateUserRole(addResult.Id, user.RoleIds);
+                await _unitOfWork.CompleteAsync();
+            }
+
+            var reloaded = await _unitOfWork.Users.FindAsync(
+                           u => u.Id == addResult.Id,
+                           include: q => q.Include(u => u.Userroles).ThenInclude(ur => ur.Role)!);
+
             return new V_GetUser
             {
-                Id = addResult.Id,
-                Username = addResult.Username,
-                Fullname = addResult.Fullname,
-                Passwordhash = addResult.Passwordhash,
-                RoleId = addResult.Userroles!.Select(ur => ur.Role?.Id ?? 0).ToList(),
-                RoleName = addResult.Userroles!.Select(ur => ur.Role?.Name ?? string.Empty).ToList()
+                Id = reloaded!.Id,
+                Username = reloaded.Username,
+                Fullname = reloaded.Fullname,
+                Passwordhash = reloaded.Passwordhash,
+                RoleId = reloaded.Userroles!.Select(ur => ur.Role?.Id ?? 0).ToList(),
+                RoleName = reloaded.Userroles!.Select(ur => ur.Role?.Name ?? string.Empty).ToList()
             };
         }
 
-        public async Task<V_GetUser?> UpdateUser(V_User user)
+        public async Task<V_GetUser?> UpdateUser(V_UpdateUser user)
         {
             var existingItem = await _unitOfWork.Users.GetByIdAsync(user.Id) ??
                                throw new ApplicationException("Cannot find user. Try again!");
 
-            if (!string.IsNullOrWhiteSpace(user.Username))
-            {
-                existingItem.Username = user.Username;
-            }
-
-            if (!string.IsNullOrWhiteSpace(user.Username))
+            if (!string.IsNullOrWhiteSpace(user.Fullname))
             {
                 existingItem.Fullname = user.Fullname;
+            }
+
+            if (!string.IsNullOrWhiteSpace(user.Email))
+            {
+                existingItem.Email = user.Email;
             }
 
             if (!string.IsNullOrWhiteSpace(user.Password))
@@ -72,20 +82,31 @@ namespace EFCorePracticeAPI.Service.Implement
                 existingItem.Passwordhash = BCrypt.Net.BCrypt.HashPassword(user.Password);
             }
 
+            if (user.RoleId != null && user.RoleId.Count > 0)
+            {
+                await _unitOfWork.Roles.UpdateUserRole(existingItem.Id, user.RoleId);
+            }
+
             var updated = await _unitOfWork.Users.UpdateAsync(existingItem) ??
                           throw new ApplicationException("Failed to update user");
 
             await _unitOfWork.CompleteAsync();
 
-            return new V_GetUser
-            {
-                Id = updated.Id,
-                Username = updated.Username,
-                Fullname = updated.Fullname,
-                Passwordhash = updated.Passwordhash,
-                RoleId = updated.Userroles?.Select(ur => ur.Role?.Id ?? 0).ToList() ?? [],
-                RoleName = updated.Userroles?.Select(ur => ur.Role?.Name ?? string.Empty).ToList() ?? []
-            };
+            var reloaded = await _unitOfWork.Users.FindAsync(
+                           u => u.Id == updated.Id,
+                           include: q => q.Include(u => u.Userroles).ThenInclude(ur => ur.Role)!);
+
+            return reloaded == null
+                ? throw new ApplicationException("Failed to reload user after update")
+                : new V_GetUser
+                {
+                    Id = reloaded.Id,
+                    Username = reloaded.Username,
+                    Fullname = reloaded.Fullname,
+                    Passwordhash = reloaded.Passwordhash,
+                    RoleId = reloaded.Userroles?.Select(ur => ur.Roleid ?? 0).ToList() ?? [],
+                    RoleName = reloaded.Userroles?.Select(ur => ur.Role?.Name ?? string.Empty).ToList() ?? []
+                };
         }
 
         public async Task<PagedResultDto<V_GetUser>> GetAllUser(SearchDto searchDto)
