@@ -4,7 +4,6 @@ using EFCorePracticeAPI.Service.Interface;
 using EFCorePracticeAPI.ViewModals;
 using EFCorePracticeAPI.ViewModals.Role;
 using EFCorePracticeAPI.ViewModals.User;
-using Microsoft.AspNetCore.Identity;
 
 namespace EFCorePracticeAPI.Service.Implement
 {

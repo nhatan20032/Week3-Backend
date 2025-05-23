@@ -130,13 +130,13 @@ namespace EFCorePracticeAPI.Service.Implement
             return result == null
                 ? throw new ApplicationException("Cannot find user. Try again!")
                 : new V_GetUser
-            {
-                Id = result.Id,
-                Username = result.Username,
-                Fullname = result.Fullname,
-                Passwordhash = result.Passwordhash,
-                RoleName = result.Userroles!.Select(ur => ur.Role?.Name ?? string.Empty).ToList()
-            };
+                {
+                    Id = result.Id,
+                    Username = result.Username,
+                    Fullname = result.Fullname,
+                    Passwordhash = result.Passwordhash,
+                    RoleName = result.Userroles!.Select(ur => ur.Role?.Name ?? string.Empty).ToList()
+                };
         }
 
         public async Task<LoginResult<V_GetUser>?> Login(string username, string password)
