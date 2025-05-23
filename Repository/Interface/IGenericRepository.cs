@@ -6,8 +6,8 @@ namespace EFCorePracticeAPI.Repository.Interface
 {
     public interface IGenericRepository<T> where T : class
     {
-        Task<PagedResult<T>> GetAllAsync(int pageNumber = 1,
-            int pageSize = 10,
+        Task<PagedResult<T>> GetAllAsync(int? pageNumber,
+            int? pageSize,
             Expression<Func<T, bool>> filter = null!,
             Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null!,
             Func<IQueryable<T>, IIncludableQueryable<T, object>> include = null!);

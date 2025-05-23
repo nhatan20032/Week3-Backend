@@ -1,5 +1,6 @@
 ﻿using EFCorePracticeAPI.Dtos;
 using EFCorePracticeAPI.Service.Interface;
+using EFCorePracticeAPI.ViewModals;
 using EFCorePracticeAPI.ViewModals.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -19,9 +20,16 @@ namespace EFCorePracticeAPI.Controllers
         }
 
         [HttpGet("GetUser")]
-        public async Task<IActionResult> GetAllUser(int page = 1, int pageSize = 10, string search = "")
+        [AllowAnonymous]
+        public async Task<IActionResult> GetAllUser([FromQuery] SearchDto searchDto)
         {
-            var result = await _userService.GetAllUser(page, pageSize, search);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var result = await _userService.GetAllUser(searchDto);
+
             return Ok(result);
         }
 
@@ -29,10 +37,12 @@ namespace EFCorePracticeAPI.Controllers
         public async Task<IActionResult> GetUserById([FromRoute] int id)
         {
             var result = await _userService.GetUserById(id);
+
             if (result == null)
             {
                 return NotFound($"Entity of type User with ID {id} not found.");
             }
+
             return Ok(result);
         }
 
@@ -82,7 +92,13 @@ namespace EFCorePracticeAPI.Controllers
         [HttpPut("UpdateUser")]
         public async Task<IActionResult> UpdateUser([FromBody] V_User user)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             var result = await _userService.UpdateUser(user);
+
             if (result == null)
             {
                 return NotFound($"Entity of type User with ID {user.Id} not found.");

@@ -49,8 +49,8 @@ namespace EFCorePracticeAPI.Repository.Implement
             return await query.Where(expression).ToListAsync();
         }
 
-        public async Task<PagedResult<T>> GetAllAsync(int pageNumber = 1,
-                    int pageSize = 10,
+        public async Task<PagedResult<T>> GetAllAsync(int? pageNumber,
+                    int? pageSize,
                     Expression<Func<T, bool>> filter = null!,
                     Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null!,
                     Func<IQueryable<T>, IIncludableQueryable<T, object>> include = null!)
@@ -66,12 +66,18 @@ namespace EFCorePracticeAPI.Repository.Implement
             if (orderBy != null)
                 query = orderBy(query);
 
-            var totalRecords = await query.AsNoTracking().CountAsync();
-            var items = await query
-                .AsNoTracking()
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
+            query = query.AsNoTracking().AsQueryable();
+
+            var totalRecords = await query.CountAsync();
+
+            if (pageNumber.HasValue && pageSize.HasValue)
+            {
+                query = query
+                    .Skip((pageNumber.Value - 1) * pageSize.Value)
+                    .Take(pageSize.Value);
+            }
+
+            var items = await query.ToListAsync();
 
             return new PagedResult<T>
             {
@@ -79,7 +85,9 @@ namespace EFCorePracticeAPI.Repository.Implement
                 TotalCount = totalRecords,
                 PageNumber = pageNumber,
                 PageSize = pageSize,
-                TotalPages = (int)Math.Ceiling(totalRecords / (double)pageSize)
+                TotalPages = pageSize.HasValue && pageSize.Value > 0
+                            ? (int)Math.Ceiling(totalRecords / (double)pageSize.Value)
+                            : 1
             };
         }
 

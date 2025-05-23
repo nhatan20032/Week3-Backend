@@ -3,9 +3,9 @@ using FluentValidation;
 
 namespace EFCorePracticeAPI.FluentValidators
 {
-    public sealed class CreateUserDtoValidator : AbstractValidator<V_User>
+    public sealed class CreateOrEditUserDtoValidator : AbstractValidator<V_User>
     {
-        public CreateUserDtoValidator()
+        public CreateOrEditUserDtoValidator()
         {
             RuleFor(x => x.Username)
                 .NotEmpty()

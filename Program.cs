@@ -70,7 +70,8 @@ builder.Services.AddProblemDetails();
 //FluentValidation
 builder.Services.AddFluentValidationAutoValidation()
                 .AddFluentValidationClientsideAdapters();
-builder.Services.AddValidatorsFromAssemblyContaining<CreateUserDtoValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<CreateOrEditUserDtoValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<GetAllDtolValidator>();
 
 // Dependency Injection For TokenProvider
 builder.Services.AddSingleton<TokenProvider>();

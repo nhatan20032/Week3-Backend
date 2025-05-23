@@ -88,14 +88,14 @@ namespace EFCorePracticeAPI.Service.Implement
             };
         }
 
-        public async Task<PagedResultDto<V_GetUser>> GetAllUser(int page = 1, int pageSize = 10, string search = "")
+        public async Task<PagedResultDto<V_GetUser>> GetAllUser(SearchDto searchDto)
         {
             var pagedResult = await _unitOfWork.Users.GetAllAsync(
-                pageNumber: page,
-                pageSize: pageSize,
-                filter: x => string.IsNullOrEmpty(search) ||
-                        x.Username.ToLower().Contains(search.ToLower()) ||
-                        x.Fullname!.ToLower().Contains(search.ToLower()),
+                pageNumber: searchDto.Page,
+                pageSize: searchDto.PageSize,
+                filter: x => string.IsNullOrEmpty(searchDto.Search) ||
+                        x.Username.ToLower().Contains(searchDto.Search.ToLower()) ||
+                        x.Fullname!.ToLower().Contains(searchDto.Search.ToLower()),
                 orderBy: q => q.OrderBy(x => x.Fullname),
                 include: query => query
                         .Include(u => u.Userroles!)
