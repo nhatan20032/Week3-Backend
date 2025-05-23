@@ -4,10 +4,7 @@ using EFCorePracticeAPI.Repository.Interface;
 
 namespace EFCorePracticeAPI.Repository.Implement
 {
-    public class UserRepository : GenericRepository<User>, IUserRepository
+    public class UserRepository(AppDbContext context) : GenericRepository<User>(context), IUserRepository
     {
-        public UserRepository(AppDbContext context) : base(context)
-        {
-        }
     }
 }

@@ -19,7 +19,7 @@ namespace EFCorePracticeAPI.Repository.Implement
 
         public async Task<T> AddAsync(T entity)
         {
-            await _context.Set<T>().AddAsync(entity);
+            await _dbSet.AddAsync(entity);
             return await Task.FromResult(entity);
         }
 

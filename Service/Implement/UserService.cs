@@ -27,7 +27,7 @@ namespace EFCorePracticeAPI.Service.Implement
 
         public async Task<V_GetUser?> AddUser(V_User user)
         {
-            var addUserResult = await _unitOfWork.Users.AddAsync(new User
+            var addResult = await _unitOfWork.Users.AddAsync(new User
             {
                 Username = user.Username,
                 Passwordhash = BCrypt.Net.BCrypt.HashPassword(user.Password),
@@ -36,43 +36,43 @@ namespace EFCorePracticeAPI.Service.Implement
 
             await _unitOfWork.CompleteAsync();
 
-            if (addUserResult == null)
+            if (addResult == null)
             {
                 throw new ApplicationException("Failed to create new user");
             }
 
             return new V_GetUser
             {
-                Id = addUserResult.Id,
-                Username = addUserResult.Username,
-                Fullname = addUserResult.Fullname,
-                Passwordhash = addUserResult.Passwordhash,
-                RoleId = addUserResult.Userroles!.Select(ur => ur.Role?.Id ?? 0).ToList(),
-                RoleName = addUserResult.Userroles!.Select(ur => ur.Role?.Name ?? string.Empty).ToList()
+                Id = addResult.Id,
+                Username = addResult.Username,
+                Fullname = addResult.Fullname,
+                Passwordhash = addResult.Passwordhash,
+                RoleId = addResult.Userroles!.Select(ur => ur.Role?.Id ?? 0).ToList(),
+                RoleName = addResult.Userroles!.Select(ur => ur.Role?.Name ?? string.Empty).ToList()
             };
         }
 
         public async Task<V_GetUser?> UpdateUser(V_User user)
         {
-            var existingUser = await _unitOfWork.Users.GetByIdAsync(user.Id) ??
+            var existingItem = await _unitOfWork.Users.GetByIdAsync(user.Id) ??
                                throw new ApplicationException("Cannot find user. Try again!");
 
             if (!string.IsNullOrWhiteSpace(user.Username))
             {
-                existingUser.Username = user.Username;
+                existingItem.Username = user.Username;
             }
 
             if (!string.IsNullOrWhiteSpace(user.Username))
             {
-                existingUser.Fullname = user.Fullname;
+                existingItem.Fullname = user.Fullname;
             }
 
             if (!string.IsNullOrWhiteSpace(user.Password))
             {
-                existingUser.Passwordhash = BCrypt.Net.BCrypt.HashPassword(user.Password);
+                existingItem.Passwordhash = BCrypt.Net.BCrypt.HashPassword(user.Password);
             }
 
-            var updated = await _unitOfWork.Users.UpdateAsync(existingUser) ??
+            var updated = await _unitOfWork.Users.UpdateAsync(existingItem) ??
                           throw new ApplicationException("Failed to update user");
 
             await _unitOfWork.CompleteAsync();
@@ -125,20 +125,17 @@ namespace EFCorePracticeAPI.Service.Implement
 
         public async Task<V_GetUser?> GetUserById(int id)
         {
-            var user = await _unitOfWork.Users.GetByIdAsync(id);
+            var result = await _unitOfWork.Users.GetByIdAsync(id);
 
-            if (user == null)
+            return result == null
+                ? throw new ApplicationException("Cannot find user. Try again!")
+                : new V_GetUser
             {
-                throw new ApplicationException("Cannot find user. Try again!");
-            }
-
-            return new V_GetUser
-            {
-                Id = user.Id,
-                Username = user.Username,
-                Fullname = user.Fullname,
-                Passwordhash = user.Passwordhash,
-                RoleName = user.Userroles!.Select(ur => ur.Role?.Name ?? string.Empty).ToList()
+                Id = result.Id,
+                Username = result.Username,
+                Fullname = result.Fullname,
+                Passwordhash = result.Passwordhash,
+                RoleName = result.Userroles!.Select(ur => ur.Role?.Name ?? string.Empty).ToList()
             };
         }
 
@@ -197,22 +194,22 @@ namespace EFCorePracticeAPI.Service.Implement
 
         public async Task<V_GetUser?> DeleteUser(int id)
         {
-            var user = await _unitOfWork.Users.GetByIdAsync(id) ??
+            var item = await _unitOfWork.Users.GetByIdAsync(id) ??
                        throw new ApplicationException("Cannot find user. Try again!");
 
-            var deletedUser = await _unitOfWork.Users.DeleteAsync(user) ??
+            var deletedItem = await _unitOfWork.Users.DeleteAsync(item) ??
                               throw new ApplicationException("Failed to delete user");
 
             await _unitOfWork.CompleteAsync();
 
             return new V_GetUser
             {
-                Id = deletedUser.Id,
-                Username = deletedUser.Username,
-                Fullname = deletedUser.Fullname,
-                Passwordhash = deletedUser.Passwordhash,
-                RoleId = deletedUser.Userroles!.Select(ur => ur.Role?.Id ?? 0).ToList(),
-                RoleName = deletedUser.Userroles!.Select(ur => ur.Role?.Name ?? string.Empty).ToList()
+                Id = deletedItem.Id,
+                Username = deletedItem.Username,
+                Fullname = deletedItem.Fullname,
+                Passwordhash = deletedItem.Passwordhash,
+                RoleId = deletedItem.Userroles!.Select(ur => ur.Role?.Id ?? 0).ToList(),
+                RoleName = deletedItem.Userroles!.Select(ur => ur.Role?.Name ?? string.Empty).ToList()
             };
         }
 
