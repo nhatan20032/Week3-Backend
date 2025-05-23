@@ -30,7 +30,7 @@ namespace EFCorePracticeAPI.Service.Implement
             var addUserResult = await _unitOfWork.Users.AddAsync(new User
             {
                 Username = user.Username,
-                Passwordhash = BCrypt.Net.BCrypt.HashPassword(user.Passwordhash),
+                Passwordhash = BCrypt.Net.BCrypt.HashPassword(user.Password),
                 Fullname = string.IsNullOrEmpty(user.Fullname) ? $"User_{Guid.NewGuid()}" : user.Fullname,
             });
 
@@ -67,9 +67,9 @@ namespace EFCorePracticeAPI.Service.Implement
                 existingUser.Fullname = user.Fullname;
             }
 
-            if (!string.IsNullOrWhiteSpace(user.Passwordhash))
+            if (!string.IsNullOrWhiteSpace(user.Password))
             {
-                existingUser.Passwordhash = BCrypt.Net.BCrypt.HashPassword(user.Passwordhash);
+                existingUser.Passwordhash = BCrypt.Net.BCrypt.HashPassword(user.Password);
             }
 
             var updated = await _unitOfWork.Users.UpdateAsync(existingUser) ??

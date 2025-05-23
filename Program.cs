@@ -1,10 +1,13 @@
 using EFCorePracticeAPI.Data;
+using EFCorePracticeAPI.FluentValidators;
 using EFCorePracticeAPI.Infrastructure;
 using EFCorePracticeAPI.Middleware;
 using EFCorePracticeAPI.Repository.Implement;
 using EFCorePracticeAPI.Repository.Interface;
 using EFCorePracticeAPI.Service.Implement;
 using EFCorePracticeAPI.Service.Interface;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -63,6 +66,11 @@ builder.Services.AddDbContextFactory<AppDbContext>(options =>
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
+
+//FluentValidation
+builder.Services.AddFluentValidationAutoValidation()
+                .AddFluentValidationClientsideAdapters();
+builder.Services.AddValidatorsFromAssemblyContaining<CreateUserDtoValidator>();
 
 // Dependency Injection For TokenProvider
 builder.Services.AddSingleton<TokenProvider>();

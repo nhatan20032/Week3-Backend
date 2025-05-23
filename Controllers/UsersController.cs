@@ -64,11 +64,18 @@ namespace EFCorePracticeAPI.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AddUser([FromBody] V_User user)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             var result = await _userService.AddUser(user);
+
             if (result == null)
             {
                 return NotFound($"Entity of type User with ID {user.Id} not found.");
             }
+
             return Ok(result);
         }
 
