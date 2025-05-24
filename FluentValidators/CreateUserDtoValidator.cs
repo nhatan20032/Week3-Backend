@@ -1,5 +1,7 @@
-﻿using EFCorePracticeAPI.ViewModals.User;
+﻿using EFCorePracticeAPI.FluentValidators.Custom;
+using EFCorePracticeAPI.ViewModals.User;
 using FluentValidation;
+using System.Text.RegularExpressions;
 
 namespace EFCorePracticeAPI.FluentValidators
 {
@@ -8,12 +10,14 @@ namespace EFCorePracticeAPI.FluentValidators
         public CreateUserDtoValidator()
         {
             RuleFor(x => x.Username)
-                .NotEmpty()
+                .NotNull()
                 .WithMessage("Username is required.")
+                .MustNotContainWhitespace()
                 .Length(3, 50)
                 .WithMessage("Username must be between 3 and 50 characters long.");
 
             RuleFor(x => x.Password)
+                .MustNotContainWhitespace()
                 .MinimumLength(6).WithMessage("Password have to >= 6 charactor");
 
             RuleFor(x => x.Fullname)
@@ -22,11 +26,10 @@ namespace EFCorePracticeAPI.FluentValidators
                 .Length(3, 50)
                 .WithMessage("Fullname must be between 3 and 50 characters long.");
 
-            RuleFor(x => x.Email)
+            RuleFor(x => x.Email!)
                 .NotEmpty()
                 .WithMessage("Email is required.")
-                .EmailAddress()
-                .WithMessage("Invalid email format.");
+                .MustBeStrictEmail();
 
             RuleFor(x => x.RoleIds)
                 .NotEmpty().WithMessage("RoleIds không được rỗng.")

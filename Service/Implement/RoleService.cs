@@ -20,8 +20,8 @@ namespace EFCorePracticeAPI.Service.Implement
             var pagedResult = await _unitOfWork.Roles.GetAllAsync(
                 pageNumber: searchDto.Page,
                 pageSize: searchDto.PageSize,
-                filter: x => string.IsNullOrEmpty(searchDto.Search) ||
-                        x.Name.ToLower().Contains(searchDto.Search.ToLower()),
+                filter: x => string.IsNullOrEmpty(searchDto.Search!.Trim()) ||
+                        x.Name.ToLower().Contains(searchDto.Search.Trim().ToLower()),
                 orderBy: x => x.OrderBy(x => x.Name));
 
             return new PagedResultDto<V_Role>

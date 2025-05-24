@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace EFCorePracticeAPI.Controllers
 {
     [Route("api/[controller]")]
-    [Authorize]
+    //[Authorize]
     [ApiController]
     public class UsersController : ControllerBase
     {
@@ -70,7 +70,7 @@ namespace EFCorePracticeAPI.Controllers
         }
 
         [HttpPost("AddUser")]
-        [Authorize(Roles = "ADMIN")]
+        //[Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> AddUser([FromBody] V_CreateUser user)
         {
             if (!ModelState.IsValid)
@@ -107,7 +107,7 @@ namespace EFCorePracticeAPI.Controllers
         }
 
         [HttpDelete("DeleteUser/{id}")]
-        [Authorize(Roles = "ADMIN")]
+        //[Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> DeleteUser([FromRoute] int id)
         {
             var result = await _userService.DeleteUser(id);

@@ -31,6 +31,7 @@ namespace EFCorePracticeAPI.Service.Implement
             {
                 Username = user.Username,
                 Passwordhash = BCrypt.Net.BCrypt.HashPassword(user.Password),
+                Email = user.Email!.Trim(),
                 Fullname = string.IsNullOrEmpty(user.Fullname) ? $"User_{Guid.NewGuid()}" : user.Fullname,
             });
 
@@ -56,6 +57,7 @@ namespace EFCorePracticeAPI.Service.Implement
                 Id = reloaded!.Id,
                 Username = reloaded.Username,
                 Fullname = reloaded.Fullname,
+                Email = reloaded.Email,
                 Passwordhash = reloaded.Passwordhash,
                 RoleId = reloaded.Userroles!.Select(ur => ur.Role?.Id ?? 0).ToList(),
                 RoleName = reloaded.Userroles!.Select(ur => ur.Role?.Name ?? string.Empty).ToList()
@@ -103,6 +105,7 @@ namespace EFCorePracticeAPI.Service.Implement
                     Id = reloaded.Id,
                     Username = reloaded.Username,
                     Fullname = reloaded.Fullname,
+                    Email = reloaded.Email,
                     Passwordhash = reloaded.Passwordhash,
                     RoleId = reloaded.Userroles?.Select(ur => ur.Roleid ?? 0).ToList() ?? [],
                     RoleName = reloaded.Userroles?.Select(ur => ur.Role?.Name ?? string.Empty).ToList() ?? []
@@ -116,7 +119,8 @@ namespace EFCorePracticeAPI.Service.Implement
                 pageSize: searchDto.PageSize,
                 filter: x => string.IsNullOrEmpty(searchDto.Search) ||
                         x.Username.ToLower().Contains(searchDto.Search.ToLower()) ||
-                        x.Fullname!.ToLower().Contains(searchDto.Search.ToLower()),
+                        x.Fullname!.ToLower().Contains(searchDto.Search.ToLower()) || 
+                        x.Email!.ToLower().Contains(searchDto.Search.ToLower()),
                 orderBy: q => q.OrderBy(x => x.Fullname),
                 include: query => query
                         .Include(u => u.Userroles!)
@@ -130,6 +134,7 @@ namespace EFCorePracticeAPI.Service.Implement
                     Id = user.Id,
                     Username = user.Username,
                     Fullname = user.Fullname,
+                    Email = user.Email,
                     Passwordhash = user.Passwordhash,
                     RoleId = user.Userroles!.Select(ur => ur.Role?.Id ?? 0).ToList(),
                     RoleName = user.Userroles!.Select(ur => ur.Role?.Name ?? string.Empty).ToList()
@@ -154,6 +159,7 @@ namespace EFCorePracticeAPI.Service.Implement
                 {
                     Id = result.Id,
                     Username = result.Username,
+                    Email = result.Email,
                     Fullname = result.Fullname,
                     Passwordhash = result.Passwordhash,
                     RoleName = result.Userroles!.Select(ur => ur.Role?.Name ?? string.Empty).ToList()
@@ -172,6 +178,7 @@ namespace EFCorePracticeAPI.Service.Implement
                 Id = user.Id,
                 Username = user.Username,
                 Fullname = user.Fullname,
+                Email = user.Email,
                 Passwordhash = user.Passwordhash,
                 RoleName = user.Userroles?.Select(ur => ur.Role?.Name ?? string.Empty).ToList() ?? [],
                 RoleId = user.Userroles?.Select(ur => ur.Role?.Id ?? 0).ToList() ?? []
@@ -200,6 +207,7 @@ namespace EFCorePracticeAPI.Service.Implement
                     Id = user.Id,
                     Username = user.Username,
                     Fullname = user.Fullname,
+                    Email = user.Email,
                     Passwordhash = user.Passwordhash,
                     RoleName = user.Userroles?.Select(ur => ur.Role?.Name ?? string.Empty).ToList() ?? [],
                     RoleId = user.Userroles?.Select(ur => ur.Role?.Id ?? 0).ToList() ?? []
@@ -228,6 +236,7 @@ namespace EFCorePracticeAPI.Service.Implement
                 Id = deletedItem.Id,
                 Username = deletedItem.Username,
                 Fullname = deletedItem.Fullname,
+                Email = deletedItem.Email,
                 Passwordhash = deletedItem.Passwordhash,
                 RoleId = deletedItem.Userroles!.Select(ur => ur.Role?.Id ?? 0).ToList(),
                 RoleName = deletedItem.Userroles!.Select(ur => ur.Role?.Name ?? string.Empty).ToList()
