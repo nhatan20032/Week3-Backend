@@ -140,7 +140,10 @@ app.UseExceptionHandler();
 
 app.UseAuthentication();
 
+app.UseMiddleware<AuthorizationLoggingMiddleware>();
+
 app.UseAuthorization();
+
 
 app.UseCors("AllowAllOrigins");
 

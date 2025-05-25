@@ -1,4 +1,5 @@
-﻿using EFCorePracticeAPI.Infrastructure;
+﻿using EFCorePracticeAPI.CustomException;
+using EFCorePracticeAPI.Infrastructure;
 using EFCorePracticeAPI.Models;
 using EFCorePracticeAPI.Repository.Interface;
 using EFCorePracticeAPI.Service.Interface;
@@ -295,7 +296,7 @@ namespace EFCorePracticeAPI.Service.Implement
 
             if (userId != currentUserId)
             {
-                throw new ApplicationException("You are not authorized to revoke this token");
+                throw new ForbiddenException("You are not authorized to revoke this token");
             }
 
             await _unitOfWork.RefreshTokens.DeleteAsync(t => t.UserId == userId);
