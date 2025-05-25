@@ -2,6 +2,7 @@
 using EFCorePracticeAPI.FluentValidators.Custom;
 using EFCorePracticeAPI.ViewModals.User;
 using FluentValidation;
+
 namespace EFCorePracticeAPI.FluentValidators
 {
     public sealed class CreateUserDtoValidator : AbstractValidator<V_CreateUser>
@@ -17,6 +18,8 @@ namespace EFCorePracticeAPI.FluentValidators
                 .WithMessage("Username must be between 3 and 50 characters long.");
 
             RuleFor(x => x.Password)
+                .NotNull()
+                .WithMessage("Password is required.")
                 .MustNotContainWhitespace()
                 .MinimumLength(6).WithMessage("Password have to >= 6 charactor");
 

@@ -89,7 +89,7 @@ namespace EFCorePracticeAPI.Controllers
         }
 
         [HttpPut("UpdateUser")]
-        [Authorize(Roles = "ADMIN")]
+        //[Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> UpdateUser([FromBody] V_UpdateUser user)
         {
             if (!ModelState.IsValid)

@@ -16,12 +16,12 @@ namespace EFCorePracticeAPI.Repository.Implement
 
         public async Task<List<Userrole>> CreateUserRole(int userId, List<int> roleIds)
         {
-            if (roleIds == null || !roleIds.Any())
+            if (roleIds == null || roleIds.Count == 0)
             {
                 var roleId = await _context.Set<Role>().FirstOrDefaultAsync(r => r.IsDefault == true);
                 if (roleId != null)
                 {
-                    roleIds = new List<int> { roleId.Id };
+                    roleIds = [roleId.Id];
                 }
                 else
                 {

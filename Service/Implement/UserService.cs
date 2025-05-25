@@ -82,9 +82,9 @@ namespace EFCorePracticeAPI.Service.Implement
                 existingItem.Passwordhash = BCrypt.Net.BCrypt.HashPassword(user.Password);
             }
 
-            if (user.RoleId != null && user.RoleId.Count > 0)
+            if (user.RoleIds != null && user.RoleIds.Count > 0)
             {
-                await _unitOfWork.Roles.UpdateUserRole(existingItem.Id, user.RoleId);
+                await _unitOfWork.Roles.UpdateUserRole(existingItem.Id, user.RoleIds);
             }
 
             var updated = await _unitOfWork.Users.UpdateAsync(existingItem) ??
