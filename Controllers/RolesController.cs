@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace EFCorePracticeAPI.Controllers
 {
     [Route("api/[controller]")]
-    [Authorize(Roles = "ADMIN")]
+    //[Authorize(Roles = "ADMIN")]
     [ApiController]
     public class RolesController : ControllerBase
     {

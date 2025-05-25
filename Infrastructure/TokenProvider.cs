@@ -21,7 +21,9 @@ namespace EFCorePracticeAPI.Infrastructure
                 Subject = new ClaimsIdentity(
                 [
                     new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-                    new Claim(JwtRegisteredClaimNames.Email, user.Username),
+                    new Claim(JwtRegisteredClaimNames.UniqueName, user.Username),
+                    new Claim(JwtRegisteredClaimNames.GivenName, user.Fullname ?? ""),
+                    new Claim(JwtRegisteredClaimNames.Email, user.Email ?? ""),
                 ]),
                 Expires = DateTime.UtcNow.AddMinutes(configuration.GetValue<int>("Jwt:ExpirationInMinutes")),
                 SigningCredentials = credentials,

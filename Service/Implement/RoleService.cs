@@ -1,18 +1,24 @@
-﻿using EFCorePracticeAPI.Models;
+﻿using EFCorePracticeAPI.CustomException;
+using EFCorePracticeAPI.Models;
 using EFCorePracticeAPI.Repository.Interface;
 using EFCorePracticeAPI.Service.Interface;
 using EFCorePracticeAPI.ViewModals;
 using EFCorePracticeAPI.ViewModals.Role;
 using EFCorePracticeAPI.ViewModals.User;
+using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 namespace EFCorePracticeAPI.Service.Implement
 {
     public class RoleService : IRoleService
     {
         private readonly IUnitOfWork _unitOfWork;
-        public RoleService(IUnitOfWork unitOfWork)
+        private readonly ICurrentUserService _currentUser;
+
+        public RoleService(IUnitOfWork unitOfWork, ICurrentUserService currentUser)
         {
             _unitOfWork = unitOfWork;
+            _currentUser = currentUser;
         }
 
         public async Task<PagedResultDto<V_Role>> GetAllRole(SearchDto searchDto)
@@ -99,19 +105,27 @@ namespace EFCorePracticeAPI.Service.Implement
 
         public async Task<V_Role?> DeleteRole(int id)
         {
-            var item = await _unitOfWork.Roles.GetByIdAsync(id) ??
+            try
+            {
+                var item = await _unitOfWork.Roles.GetByIdAsync(id) ??
                        throw new ApplicationException("Cannot find Role. Try again!");
 
-            var deletedItem = await _unitOfWork.Roles.DeleteAsync(item) ??
-                              throw new ApplicationException("Failed to delete Role");
+                var deletedItem = await _unitOfWork.Roles.DeleteAsync(item) ??
+                                  throw new ApplicationException("Failed to delete Role");
 
-            await _unitOfWork.CompleteAsync();
+                await _unitOfWork.CompleteAsync();
 
-            return new V_Role
+                return new V_Role
+                {
+                    Id = deletedItem.Id,
+                    Name = deletedItem.Name,
+                };
+            }
+            catch (DbUpdateException)
             {
-                Id = deletedItem.Id,
-                Name = deletedItem.Name,
-            };
+                Log.Error("User '{User}' attempted to delete role with ID {Id}, but it is in use.", _currentUser.Username, id);
+                throw new ApplicationException("The role is currently in use and cannot be deleted.");
+            }
         }
 
         public async Task<V_GetUser> AddRoleForUser(V_RoleUser roleUser)

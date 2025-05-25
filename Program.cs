@@ -1,4 +1,4 @@
-using EFCorePracticeAPI.Data;
+﻿using EFCorePracticeAPI.Data;
 using EFCorePracticeAPI.FluentValidators;
 using EFCorePracticeAPI.Infrastructure;
 using EFCorePracticeAPI.Middleware;
@@ -20,6 +20,12 @@ Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Override("Microsoft.AspNetCore", Serilog.Events.LogEventLevel.Information)
     .Enrich.FromLogContext()
     .WriteTo.Console()
+    .WriteTo.File(
+        path: "logs/log-.txt",
+        rollingInterval: RollingInterval.Day,
+        retainedFileCountLimit: 7,
+        outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz}] [{Level:u3}] {Message:lj}{NewLine}"
+    )
     .CreateLogger();
 
 var builder = WebApplication.CreateBuilder(args);
@@ -71,6 +77,9 @@ builder.Services.AddProblemDetails();
 builder.Services.AddFluentValidationAutoValidation()
                 .AddFluentValidationClientsideAdapters();
 builder.Services.AddValidatorsFromAssemblyContaining<CreateUserDtoValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<UpdateUserDtoValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<UpdateRoleDtoValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<CreateRoleDtoValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<GetAllDtolValidator>();
 
 // Dependency Injection For TokenProvider
@@ -85,6 +94,7 @@ builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 // Dependency Injection For Services
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
+builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 
 
 builder.Services.AddHttpContextAccessor();

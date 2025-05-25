@@ -47,5 +47,14 @@ namespace EFCorePracticeAPI.FluentValidators.Custom
                 return !context.Roles.Any(u => u.Name == roleName);
             }).WithMessage("Role already exist!");
         }
+
+        public static IRuleBuilderOptions<T, bool> MustUniqueIsDefault<T>(
+        this IRuleBuilder<T, bool> ruleBuilder, AppDbContext context)
+        {
+            return ruleBuilder.Must(isDefault =>
+            {
+                return !context.Roles.Any(u => u.IsDefault == isDefault);
+            }).WithMessage("Only one role can be default.");
+        }
     }
 }

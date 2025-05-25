@@ -5,9 +5,9 @@ using FluentValidation;
 
 namespace EFCorePracticeAPI.FluentValidators
 {
-    public class CreateAndUpdateRoleDtoValidator : AbstractValidator<V_Role>
+    public class CreateRoleDtoValidator : AbstractValidator<V_Role>
     {
-        public CreateAndUpdateRoleDtoValidator(AppDbContext context)
+        public CreateRoleDtoValidator(AppDbContext context)
         {
             RuleFor(x => x.Name)
                 .NotEmpty()
