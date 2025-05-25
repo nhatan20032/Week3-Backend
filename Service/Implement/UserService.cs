@@ -32,7 +32,7 @@ namespace EFCorePracticeAPI.Service.Implement
                 Username = user.Username,
                 Passwordhash = BCrypt.Net.BCrypt.HashPassword(user.Password),
                 Email = user.Email!.Trim(),
-                Fullname = string.IsNullOrEmpty(user.Fullname) ? $"User_{Guid.NewGuid()}" : user.Fullname,
+                Fullname = string.IsNullOrWhiteSpace(user.Fullname) ? $"User_{Guid.NewGuid()}" : user.Fullname.Trim(),
             });
 
             await _unitOfWork.CompleteAsync();
@@ -69,7 +69,7 @@ namespace EFCorePracticeAPI.Service.Implement
 
             if (!string.IsNullOrWhiteSpace(user.Fullname))
             {
-                existingItem.Fullname = user.Fullname;
+                existingItem.Fullname = user.Fullname.Trim();
             }
 
             if (!string.IsNullOrWhiteSpace(user.Email))

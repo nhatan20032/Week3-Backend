@@ -26,6 +26,11 @@ namespace EFCorePracticeAPI.FluentValidators
             RuleFor(x => x.RoleIds)
                 .Must(roleIds => roleIds!.Distinct().Count() == roleIds!.Count)
                 .WithMessage("RoleIds cannot be duplicate.");
+
+            RuleForEach(x => x.RoleIds)
+                        .Must(roleId => roleId > 0)
+                        .When(x => x.RoleIds != null && x.RoleIds.Count != 0)
+                        .WithMessage("All RoleIds must be positive integers like 1, 2, 3...");
         }
     }
 }

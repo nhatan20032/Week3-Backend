@@ -38,5 +38,14 @@ namespace EFCorePracticeAPI.FluentValidators.Custom
                 return !context.Users.Any(u => u.Email == email);
             }).WithMessage("Email already exist!");
         }
+
+        public static IRuleBuilderOptions<T, string> MustUniqueRole<T>(
+        this IRuleBuilder<T, string> ruleBuilder, AppDbContext context)
+        {
+            return ruleBuilder.Must(roleName =>
+            {
+                return !context.Roles.Any(u => u.Name == roleName);
+            }).WithMessage("Role already exist!");
+        }
     }
 }

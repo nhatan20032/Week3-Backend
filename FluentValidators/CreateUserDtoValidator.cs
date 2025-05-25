@@ -24,10 +24,9 @@ namespace EFCorePracticeAPI.FluentValidators
                 .MinimumLength(6).WithMessage("Password have to >= 6 charactor");
 
             RuleFor(x => x.Fullname)
-                .NotEmpty()
-                .WithMessage("Fullname is required.")
                 .Length(3, 50)
-                .WithMessage("Fullname must be between 3 and 50 characters long.");
+                .WithMessage("Fullname must be between 3 and 50 characters long.")
+                .When(x => !string.IsNullOrWhiteSpace(x.Fullname));
 
             RuleFor(x => x.Email!)
                 .NotEmpty()
