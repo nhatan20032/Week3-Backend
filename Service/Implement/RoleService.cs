@@ -1,5 +1,4 @@
-﻿using EFCorePracticeAPI.CustomException;
-using EFCorePracticeAPI.Models;
+﻿using EFCorePracticeAPI.Models;
 using EFCorePracticeAPI.Repository.Interface;
 using EFCorePracticeAPI.Service.Interface;
 using EFCorePracticeAPI.ViewModals;
@@ -23,84 +22,136 @@ namespace EFCorePracticeAPI.Service.Implement
 
         public async Task<PagedResultDto<V_Role>> GetAllRole(SearchDto searchDto)
         {
-            var pagedResult = await _unitOfWork.Roles.GetAllAsync(
+            try
+            {
+                var pagedResult = await _unitOfWork.Roles.GetAllAsync(
                 pageNumber: searchDto.Page,
                 pageSize: searchDto.PageSize,
                 filter: x => string.IsNullOrEmpty(searchDto.Search!.Trim()) ||
                         x.Name.ToLower().Contains(searchDto.Search.Trim().ToLower()),
                 orderBy: x => x.OrderBy(x => x.Name));
 
-            return new PagedResultDto<V_Role>
+                return new PagedResultDto<V_Role>
+                {
+                    Data = pagedResult.Items.Select(x => new V_Role
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                    }).ToList(),
+                    Meta = new PaginationMeta
+                    {
+                        CurrentPage = pagedResult.PageNumber,
+                        PageSize = pagedResult.PageSize,
+                        TotalItems = pagedResult.TotalCount,
+                        TotalPages = pagedResult.TotalPages
+                    }
+                };
+            }
+            catch (ApplicationException ex)
             {
-                Data = pagedResult.Items.Select(x => new V_Role
-                {
-                    Id = x.Id,
-                    Name = x.Name,
-                }).ToList(),
-                Meta = new PaginationMeta
-                {
-                    CurrentPage = pagedResult.PageNumber,
-                    PageSize = pagedResult.PageSize,
-                    TotalItems = pagedResult.TotalCount,
-                    TotalPages = pagedResult.TotalPages
-                }
-            };
+                Log.Error("User '{User}' failed to get all roles. Application error: {Error}", _currentUser.Username, ex.Message);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"Message: {ex}");
+                throw;
+            }
         }
 
         public async Task<V_Role?> GetRoleById(int id)
         {
-            var result = await _unitOfWork.Roles.GetByIdAsync(id);
+            try
+            {
+                var result = await _unitOfWork.Roles.GetByIdAsync(id);
 
-            return result == null
-                ? throw new ApplicationException("Cannot find role. Try again!")
-                : new V_Role
-                {
-                    Id = result.Id,
-                    Name = result.Name,
-                };
+                return result == null
+                    ? throw new ApplicationException("Cannot find role. Try again!")
+                    : new V_Role
+                    {
+                        Id = result.Id,
+                        Name = result.Name,
+                    };
+            }
+            catch (ApplicationException ex)
+            {
+                Log.Error("User '{User}' failed to get role by ID {Id}. Application error: {Error}", _currentUser.Username, id, ex.Message);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"Message: {ex}");
+                throw;
+            }
         }
 
         public async Task<V_Role?> AddRole(V_Role role)
         {
-            var addResult = await _unitOfWork.Roles.AddAsync(new Role
+            try
             {
-                Name = role.Name,
-            });
+                var addResult = await _unitOfWork.Roles.AddAsync(new Role
+                {
+                    Name = role.Name,
+                });
 
-            await _unitOfWork.CompleteAsync();
+                await _unitOfWork.CompleteAsync();
 
-            if (addResult == null)
-            {
-                throw new ApplicationException("Failed to create new role");
+                if (addResult == null)
+                {
+                    throw new ApplicationException("Failed to create new role");
+                }
+
+                return new V_Role
+                {
+                    Id = addResult.Id,
+                    Name = addResult.Name,
+                };
             }
-
-            return new V_Role
+            catch (ApplicationException ex)
             {
-                Id = addResult.Id,
-                Name = addResult.Name,
-            };
+                Log.Error("User '{User}' failed to add role. Application error: {Error}", _currentUser.Username, ex.Message);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"Message: {ex}");
+                throw;
+            }
         }
 
         public async Task<V_Role?> UpdateRole(V_Role role)
         {
-            var existingItem = await _unitOfWork.Roles.GetByIdAsync(role.Id) ??
+            try
+            {
+                var existingItem = await _unitOfWork.Roles.GetByIdAsync(role.Id) ??
                                throw new ApplicationException("Cannot find role. Try again!");
 
-            if (!string.IsNullOrWhiteSpace(role.Name))
-            {
-                existingItem.Name = role.Name;
+                if (!string.IsNullOrWhiteSpace(role.Name))
+                {
+                    existingItem.Name = role.Name;
+                }
+
+                var updated = await _unitOfWork.Roles.UpdateAsync(existingItem) ??
+                              throw new ApplicationException("Failed to update role");
+
+                await _unitOfWork.CompleteAsync();
+
+                return new V_Role
+                {
+                    Id = updated.Id,
+                    Name = updated.Name,
+                };
             }
-
-            var updated = await _unitOfWork.Roles.UpdateAsync(existingItem) ??
-                          throw new ApplicationException("Failed to update role");
-
-            await _unitOfWork.CompleteAsync();
-
-            return new V_Role
+            catch (ApplicationException ex)
             {
-                Id = updated.Id,
-                Name = updated.Name,
-            };
+                Log.Error("User '{User}' failed to update role ID {Id}. Application error: {Error}", _currentUser.Username, role.Id, ex.Message);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"Message: {ex}");
+                throw;
+            }
         }
 
         public async Task<V_Role?> DeleteRole(int id)
@@ -108,7 +159,7 @@ namespace EFCorePracticeAPI.Service.Implement
             try
             {
                 var item = await _unitOfWork.Roles.GetByIdAsync(id) ??
-                       throw new ApplicationException("Cannot find Role. Try again!");
+                           throw new ApplicationException("Cannot find Role. Try again!");
 
                 var deletedItem = await _unitOfWork.Roles.DeleteAsync(item) ??
                                   throw new ApplicationException("Failed to delete Role");
@@ -126,33 +177,58 @@ namespace EFCorePracticeAPI.Service.Implement
                 Log.Error("User '{User}' attempted to delete role with ID {Id}, but it is in use.", _currentUser.Username, id);
                 throw new ApplicationException("The role is currently in use and cannot be deleted.");
             }
+            catch (ApplicationException)
+            {
+                Log.Error("User '{User}' attempted to delete role with ID {Id}, but it does not exist.", _currentUser.Username, id);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                Log.Error("User '{User}' encountered unexpected error deleting role ID {Id}. Error: {Error}",
+                          _currentUser.Username, id, ex.Message);
+                throw;
+            }
         }
 
         public async Task<V_GetUser> AddRoleForUser(V_RoleUser roleUser)
         {
-            var result = await _unitOfWork.Roles.CreateUserRole(roleUser.UserId, roleUser.RoleIds);
-            var user = await _unitOfWork.Users.GetByIdAsync(roleUser.UserId);
-
-            if (result == null)
+            try
             {
-                throw new ApplicationException("Cannot add role for user, please try again");
+                var result = await _unitOfWork.Roles.CreateUserRole(roleUser.UserId, roleUser.RoleIds);
+                var user = await _unitOfWork.Users.GetByIdAsync(roleUser.UserId);
+
+                if (result == null)
+                {
+                    throw new ApplicationException("Cannot add role for user, please try again");
+                }
+
+                if (user == null)
+                {
+                    throw new ApplicationException("Cannot find user. Try again!");
+                }
+
+                return new V_GetUser
+                {
+                    Id = user.Id,
+                    Username = user.Username,
+                    Passwordhash = user.Passwordhash,
+                    Fullname = user.Fullname,
+                    Email = user.Email,
+                    RoleId = result.Select(r => r.Role!.Id).ToList(),
+                    RoleName = result.Select(r => r.Role!.Name).ToList()
+                };
             }
-
-            if (user == null)
+            catch (ApplicationException ex)
             {
-                throw new ApplicationException("Cannot find user. Try again!");
+                Log.Error("User '{User}' failed to assign roles to user ID {UserId}. Application error: {Error}", _currentUser.Username, roleUser.UserId, ex.Message);
+                throw;
             }
-
-            return new V_GetUser
+            catch (Exception ex)
             {
-                Id = user.Id,
-                Username = user.Username,
-                Passwordhash = user.Passwordhash,
-                Fullname = user.Fullname,
-                Email = user.Email,
-                RoleId = result.Select(r => r.Role!.Id).ToList(),
-                RoleName = result.Select(r => r.Role!.Name).ToList()
-            };
+                Log.Error("User '{User}' failed to assign roles to user ID {UserId}. Error: {Error}",
+                          _currentUser.Username, roleUser.UserId, ex.Message);
+                throw;
+            }
         }
     }
 }
