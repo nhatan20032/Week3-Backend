@@ -5,10 +5,30 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EFCorePracticeAPI.Repository.Implement
 {
-    public class RoleRepository(AppDbContext context) : GenericRepository<Role>(context), IRoleRepository
+    public class RoleRepository : GenericRepository<Role>, IRoleRepository
     {
+        private new readonly AppDbContext _context;
+
+        public RoleRepository(AppDbContext context) : base(context)
+        {
+            _context = context;
+        }
+
         public async Task<List<Userrole>> CreateUserRole(int userId, List<int> roleIds)
         {
+            if (roleIds == null || !roleIds.Any())
+            {
+                var roleId = await _context.Set<Role>().FirstOrDefaultAsync(r => r.IsDefault == true);
+                if (roleId != null)
+                {
+                    roleIds = new List<int> { roleId.Id };
+                }
+                else
+                {
+                    throw new ApplicationException("No roles provided and no default role found.");
+                }
+            }
+
             var userRoles = roleIds.Select(roleId => new Userrole
             {
                 Userid = userId,
@@ -16,8 +36,6 @@ namespace EFCorePracticeAPI.Repository.Implement
             }).ToList();
 
             await _context.Set<Userrole>().AddRangeAsync(userRoles);
-
-            await _context.SaveChangesAsync();
 
             return userRoles;
         }
@@ -38,10 +56,7 @@ namespace EFCorePracticeAPI.Repository.Implement
 
             await _context.Set<Userrole>().AddRangeAsync(newUserRoles);
 
-            await _context.SaveChangesAsync();
-
             return newUserRoles;
         }
-
     }
 }

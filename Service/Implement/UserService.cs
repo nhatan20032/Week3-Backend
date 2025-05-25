@@ -42,11 +42,9 @@ namespace EFCorePracticeAPI.Service.Implement
                 throw new ApplicationException("Failed to create new user");
             }
 
-            if (user.RoleIds != null && user.RoleIds.Count > 0)
-            {
-                await _unitOfWork.Roles.CreateUserRole(addResult.Id, user.RoleIds);
-                await _unitOfWork.CompleteAsync();
-            }
+            await _unitOfWork.Roles.CreateUserRole(addResult.Id, user.RoleIds);
+
+            await _unitOfWork.CompleteAsync();
 
             var reloaded = await _unitOfWork.Users.FindAsync(
                            u => u.Id == addResult.Id,
@@ -119,7 +117,7 @@ namespace EFCorePracticeAPI.Service.Implement
                 pageSize: searchDto.PageSize,
                 filter: x => string.IsNullOrEmpty(searchDto.Search) ||
                         x.Username.ToLower().Contains(searchDto.Search.ToLower()) ||
-                        x.Fullname!.ToLower().Contains(searchDto.Search.ToLower()) || 
+                        x.Fullname!.ToLower().Contains(searchDto.Search.ToLower()) ||
                         x.Email!.ToLower().Contains(searchDto.Search.ToLower()),
                 orderBy: q => q.OrderBy(x => x.Fullname),
                 include: query => query

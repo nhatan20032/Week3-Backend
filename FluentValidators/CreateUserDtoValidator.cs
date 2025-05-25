@@ -1,18 +1,18 @@
-﻿using EFCorePracticeAPI.FluentValidators.Custom;
+﻿using EFCorePracticeAPI.Data;
+using EFCorePracticeAPI.FluentValidators.Custom;
 using EFCorePracticeAPI.ViewModals.User;
 using FluentValidation;
-using System.Text.RegularExpressions;
-
 namespace EFCorePracticeAPI.FluentValidators
 {
     public sealed class CreateUserDtoValidator : AbstractValidator<V_CreateUser>
     {
-        public CreateUserDtoValidator()
+        public CreateUserDtoValidator(AppDbContext context)
         {
             RuleFor(x => x.Username)
                 .NotNull()
                 .WithMessage("Username is required.")
                 .MustNotContainWhitespace()
+                .MustUniqueUsername(context)
                 .Length(3, 50)
                 .WithMessage("Username must be between 3 and 50 characters long.");
 
@@ -29,10 +29,10 @@ namespace EFCorePracticeAPI.FluentValidators
             RuleFor(x => x.Email!)
                 .NotEmpty()
                 .WithMessage("Email is required.")
+                .MustUniqueEmail(context)
                 .MustBeStrictEmail();
 
             RuleFor(x => x.RoleIds)
-                .NotEmpty().WithMessage("RoleIds không được rỗng.")
                 .Must(roleIds => roleIds!.Distinct().Count() == roleIds!.Count)
                 .WithMessage("RoleIds cannot be duplicate.");
 

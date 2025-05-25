@@ -7,6 +7,6 @@
         public string? Fullname { get; set; }
         public string? Email { get; set; }
         public required string Password { get; set; }
-        public List<int>? RoleIds { get; set; } 
+        public List<int> RoleIds { get; set; } = new List<int>();
     }
 }
