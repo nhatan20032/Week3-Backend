@@ -6,6 +6,7 @@ using EFCorePracticeAPI.ViewModals.Role;
 using EFCorePracticeAPI.ViewModals.User;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace EFCorePracticeAPI.Service.Implement
 {
@@ -37,6 +38,7 @@ namespace EFCorePracticeAPI.Service.Implement
                     {
                         Id = x.Id,
                         Name = x.Name,
+                        IsDefault = x.IsDefault
                     }).ToList(),
                     Meta = new PaginationMeta
                     {
@@ -71,6 +73,7 @@ namespace EFCorePracticeAPI.Service.Implement
                     {
                         Id = result.Id,
                         Name = result.Name,
+                        IsDefault = result.IsDefault
                     };
             }
             catch (ApplicationException ex)
@@ -92,6 +95,7 @@ namespace EFCorePracticeAPI.Service.Implement
                 var addResult = await _unitOfWork.Roles.AddAsync(new Role
                 {
                     Name = role.Name,
+                    IsDefault = role.IsDefault
                 });
 
                 await _unitOfWork.CompleteAsync();
@@ -105,6 +109,7 @@ namespace EFCorePracticeAPI.Service.Implement
                 {
                     Id = addResult.Id,
                     Name = addResult.Name,
+                    IsDefault = addResult.IsDefault
                 };
             }
             catch (ApplicationException ex)
@@ -140,6 +145,7 @@ namespace EFCorePracticeAPI.Service.Implement
                 {
                     Id = updated.Id,
                     Name = updated.Name,
+                    IsDefault = updated.IsDefault
                 };
             }
             catch (ApplicationException ex)
@@ -170,6 +176,7 @@ namespace EFCorePracticeAPI.Service.Implement
                 {
                     Id = deletedItem.Id,
                     Name = deletedItem.Name,
+                    IsDefault = deletedItem.IsDefault
                 };
             }
             catch (DbUpdateException)
