@@ -6,7 +6,6 @@ using EFCorePracticeAPI.ViewModals.Role;
 using EFCorePracticeAPI.ViewModals.User;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace EFCorePracticeAPI.Service.Implement
 {
