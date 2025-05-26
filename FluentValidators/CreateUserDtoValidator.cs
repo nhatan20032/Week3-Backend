@@ -32,6 +32,7 @@ namespace EFCorePracticeAPI.FluentValidators
                 .NotEmpty()
                 .WithMessage("Email is required.")
                 .MustUniqueEmail(context)
+                .MustNotContainWhitespace()
                 .MustBeStrictEmail();
 
             RuleFor(x => x.RoleIds)

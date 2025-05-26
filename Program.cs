@@ -80,6 +80,7 @@ builder.Services.AddValidatorsFromAssemblyContaining<CreateUserDtoValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<UpdateUserDtoValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<UpdateRoleDtoValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<CreateRoleDtoValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<LoginDtoValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<GetAllDtolValidator>();
 
 // Dependency Injection For TokenProvider

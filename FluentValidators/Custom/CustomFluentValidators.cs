@@ -44,7 +44,7 @@ namespace EFCorePracticeAPI.FluentValidators.Custom
         {
             return ruleBuilder.Must(roleName =>
             {
-                return !context.Roles.Any(u => u.Name == roleName);
+                return !context.Roles.Any(u => u.Name == roleName.Trim().ToUpper());
             }).WithMessage("Role already exist!");
         }
 

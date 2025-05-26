@@ -21,6 +21,7 @@ namespace EFCorePracticeAPI.FluentValidators
 
             RuleFor(x => x.Email!)
                 .MustUniqueEmail(context)
+                .MustNotContainWhitespace()
                 .MustBeStrictEmail().When(x => !string.IsNullOrWhiteSpace(x.Email));
 
             RuleFor(x => x.RoleIds)

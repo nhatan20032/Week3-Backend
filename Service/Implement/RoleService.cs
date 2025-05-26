@@ -94,7 +94,7 @@ namespace EFCorePracticeAPI.Service.Implement
             {
                 var addResult = await _unitOfWork.Roles.AddAsync(new Role
                 {
-                    Name = role.Name,
+                    Name = role.Name.Trim().ToUpper(),
                     IsDefault = role.IsDefault
                 });
 
@@ -133,7 +133,7 @@ namespace EFCorePracticeAPI.Service.Implement
 
                 if (!string.IsNullOrWhiteSpace(role.Name))
                 {
-                    existingItem.Name = role.Name;
+                    existingItem.Name = role.Name.Trim().ToUpper();
                 }
 
                 var updated = await _unitOfWork.Roles.UpdateAsync(existingItem) ??
