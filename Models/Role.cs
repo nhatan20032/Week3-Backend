@@ -8,5 +8,5 @@ public partial class Role
 
     public bool IsDefault { get; set; } = false;
 
-    public virtual ICollection<Userrole> Userroles { get; set; } = new List<Userrole>();
+    public virtual ICollection<Userrole> Userroles { get; set; } = [];
 }
