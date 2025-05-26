@@ -119,9 +119,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         o.TokenValidationParameters = new TokenValidationParameters
         {
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Secret"]!)),
-            ValidIssuer = builder.Configuration["Jwt:Issuer"],
-            ValidAudience = builder.Configuration["Jwt:Audience"],
-            ClockSkew = TimeSpan.Zero,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"], // Chỉ chấp nhận token do issuer cụ thể phát hành.
+            ValidAudience = builder.Configuration["Jwt:Audience"], // Chỉ chấp nhận token cho audience cụ thể.
+            ClockSkew = TimeSpan.Zero, // Giảm độ trễ thời gian cho việc xác thực token.
         };
     });
 
