@@ -104,9 +104,9 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowAllOrigins",
         builder =>
         {
-            builder.AllowAnyOrigin()
-                .AllowAnyMethod()
-                .AllowAnyHeader();
+            builder.AllowAnyOrigin() // Cho phép domain gọi API
+                .AllowAnyMethod() // Cho phép tất cac phương thức HTTP (GET, POST, PUT, DELETE, v.v.)
+                .AllowAnyHeader(); // Cho phép tất cả các header trong request
         });
 });
 
