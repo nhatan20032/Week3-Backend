@@ -16,9 +16,9 @@ using Serilog;
 using System.Text;
 
 Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Debug()
-    .MinimumLevel.Override("Microsoft.AspNetCore", Serilog.Events.LogEventLevel.Information)
-    .Enrich.FromLogContext()
+    .MinimumLevel.Debug() // log từ mức độ Debug trở lên
+    .MinimumLevel.Override("Microsoft.AspNetCore", Serilog.Events.LogEventLevel.Information) // với namspace Microsoft.AspNetCore, chỉ log từ mức độ Information trở lên
+    .Enrich.FromLogContext() // Thêm thông tin từ LogContext (ví dụ: request id, user, v.v.).
     .WriteTo.Console()
     .WriteTo.File(
         path: "logs/log-.txt",

@@ -49,6 +49,11 @@ namespace EFCorePracticeAPI.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody] LoginRequest loginRequest)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             var result = await _userService.Login(loginRequest.Username, loginRequest.Password);
             if (result == null)
             {
