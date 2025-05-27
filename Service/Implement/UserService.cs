@@ -1,4 +1,5 @@
 ﻿using EFCorePracticeAPI.CustomException;
+using EFCorePracticeAPI.Dtos;
 using EFCorePracticeAPI.Infrastructure;
 using EFCorePracticeAPI.Models;
 using EFCorePracticeAPI.Repository.Interface;
@@ -31,6 +32,7 @@ namespace EFCorePracticeAPI.Service.Implement
         {
             try
             {
+                
                 var addResult = await _unitOfWork.Users.AddAsync(new User
                 {
                     Username = user.Username,
@@ -162,6 +164,47 @@ namespace EFCorePracticeAPI.Service.Implement
                         TotalPages = pagedResult.TotalPages
                     }
                 };
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error getting all users");
+                throw;
+            }
+        }
+
+        public async Task<List<JoinDTO>> GetAllUser2(SearchDto searchDto)
+        {
+            try
+            {
+                var getUser = await _unitOfWork.Users.GetAllAsync(pageSize: searchDto.Page, pageNumber: searchDto.PageSize);
+                var getRole = await _unitOfWork.Roles.GetAllAsync(pageSize: searchDto.Page, pageNumber: searchDto.PageSize);
+                var getUserRoles = await _unitOfWork.Repository<Userrole>().GetAllAsync(pageSize: searchDto.Page, pageNumber: searchDto.PageSize);
+
+                var join = from user in getUser.Items
+                           join userrole in getUserRoles.Items on user.Id equals userrole.Userid
+                           join role in getRole.Items on userrole.Roleid equals role.Id
+                           group new { role } by new
+                           {
+                               user.Id,
+                               user.Username,
+                               user.Fullname,
+                               user.Email,
+                               user.Passwordhash
+                           } into g
+                           select new JoinDTO
+                           {
+                               Id = g.Key.Id,
+                               Username = g.Key.Username,
+                               FullName = g.Key.Fullname,
+                               Email = g.Key.Email,
+                               PasswordHash = g.Key.Passwordhash,
+                               RoleId = g.Select(x => x.role.Id).Distinct().ToList(),
+                               RoleName = g.Select(x => x.role.Name).Distinct().ToList()
+                           };
+
+
+
+                return join.ToList();
             }
             catch (Exception ex)
             {

@@ -1,4 +1,5 @@
-﻿using EFCorePracticeAPI.ViewModals;
+﻿using EFCorePracticeAPI.Dtos;
+using EFCorePracticeAPI.ViewModals;
 using EFCorePracticeAPI.ViewModals.User;
 
 namespace EFCorePracticeAPI.Service.Interface
@@ -9,6 +10,7 @@ namespace EFCorePracticeAPI.Service.Interface
         Task<V_GetUser?> GetUserById(int id);
         Task<V_GetUser?> AddUser(V_CreateUser user);
         Task<V_GetUser?> UpdateUser(V_UpdateUser user);
+        Task<List<JoinDTO>> GetAllUser2(SearchDto searchDto);
         Task<LoginResult<V_GetUser>?> Login(string username, string password);
         Task<LoginResult<V_GetUser>?> Login(string refreshToken);
         Task<bool> RevokeRefreshToken(int userId);

@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace EFCorePracticeAPI.Controllers
 {
     [Route("api/[controller]")]
-    [Authorize]
+    //[Authorize]
     [ApiController]
     public class UsersController : ControllerBase
     {
@@ -28,6 +28,19 @@ namespace EFCorePracticeAPI.Controllers
             }
 
             var result = await _userService.GetAllUser(searchDto);
+
+            return Ok(result);
+        }
+
+        [HttpGet("GetUser2")]
+        public async Task<IActionResult> GetAllUser2([FromQuery] SearchDto searchDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var result = await _userService.GetAllUser2(searchDto);
 
             return Ok(result);
         }
@@ -133,6 +146,14 @@ namespace EFCorePracticeAPI.Controllers
                 return NotFound($"Entity of type User with ID {id} not found.");
             }
             return Ok(result);
+        }
+
+        [HttpPost("ImportFile")]
+        public IActionResult PostFile([FromForm] List<FileInputDto> fileInputDto)
+        {
+            var fileInput = fileInputDto;
+
+            return Ok();
         }
     }
 }
